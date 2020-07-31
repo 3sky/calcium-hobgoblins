@@ -52,10 +52,8 @@ jobs:
         run: gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE
       - name: set SERVICE_IP
         run: echo ::set-env name=SERVICE_IP::$(kubectl get svc --namespace default release-$APP_NAME --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
-      - name: upgrade app version
-        run: sed -i -E "s/^appVersion: (.*)/appVersion: ${{ github.sha }}/" ./helm-chart/$APP_NAME/Chart.yaml
       - name: upgrade release with helm
-        run: helm upgrade release-$APP_NAME ./helm-chart/$APP_NAME
+        run: ./setVersion.sh ${{ github.sha }} $APP_NAME
       - name: Check app is working
         uses: 3sky/glowing-spoon@v0.0.1
         with:
