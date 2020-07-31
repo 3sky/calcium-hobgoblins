@@ -44,24 +44,18 @@ jobs:
           project_id: ${{ secrets.PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
-
       - name: install kubectl
       - uses: azure/setup-kubectl@v1
         id: install
-
       - name: install helm
       - uses: azure/setup-helm@v1
         id: install
-
       - name: config cluster
         run: gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE
-
       - name: set SERVICE_IP
         run: echo ::set-env name=SERVICE_IP::$(kubectl get svc --namespace default release-$APP_NAME --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
-
       - name: upgrade release with helm
         run: helm upgrade release-$APP_NAME ./helm-chart/$APP_NAME --set=image.tag=${{ github.sha }}
-
       - name: Check app is working
         uses: 3sky/glowing-spoon@v0.0.1
         with:
