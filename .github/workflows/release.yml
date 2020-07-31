@@ -1,0 +1,71 @@
+---
+name: Deploy app to K8S pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  APP_NAME: "k8s-app"
+  CLUSTER_NAME: "my-gke-cluster"
+  CLUSTER_ZONE: "europe-west3-a"
+
+jobs:
+
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          project_id: ${{ secrets.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      - run: gcloud info
+      - name: auth to CR
+        run: gcloud auth configure-docker
+      - name: build app
+        run: docker build . -t $APP_NAME
+      - name: tag app
+        run: docker tag $APP_NAME gcr.io/${{ secrets.PROJECT_ID }}/$APP_NAME:${{ github.sha }}
+      - name: push image
+        run: docker push gcr.io/${{ secrets.PROJECT_ID }}/$APP_NAME:${{ github.sha }}
+
+  deploy-to-k8s:
+    needs: build-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          project_id: ${{ secrets.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: install kubectl
+      - uses: azure/setup-kubectl@v1
+        id: install
+
+      - name: install helm
+      - uses: azure/setup-helm@v1
+        id: install
+
+      - name: config cluster
+        run: gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE
+
+      - name: set SERVICE_IP
+        run: echo ::set-env name=SERVICE_IP::$(kubectl get svc --namespace default release-$APP_NAME --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
+
+      - name: upgrade release with helm
+        run: helm upgrade release-$APP_NAME ./helm-chart/$APP_NAME --set=image.tag=${{ github.sha }}
+
+      - name: Check app is working
+        uses: 3sky/glowing-spoon@v0.0.1
+        with:
+          hostname: $SERVICE_IP
+          path: '/status'
+          filter: '.status'
+          expected: 'OK'

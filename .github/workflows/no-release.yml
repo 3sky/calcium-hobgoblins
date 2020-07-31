@@ -1,0 +1,21 @@
+---
+name: Build image with tests
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '!v*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build app
+        run: docker build .

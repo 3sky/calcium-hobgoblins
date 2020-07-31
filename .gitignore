@@ -1,0 +1,6 @@
+helm-chart/k8s-app/.helmignore
+infra/DEV/.terraform/modules/modules.json
+infra/DEV/.terraform/plugins/linux_amd64/lock.json
+infra/DEV/.terraform/plugins/linux_amd64/terraform-provider-google_v3.17.0_x5
+infra/DEV/terraform.tfstate
+infra/DEV/terraform.tfstate.backup
