@@ -232,6 +232,13 @@ App has two endpoint:
     helm create k8s-app
     ```
 
+1. Install Ingress with Helm(nginx)
+
+    ```bash
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm install nginx-ingress ingress-nginx/ingress-nginx
+    ```
+
 ## Add GitHub Action Pipeline
 
 1. Add two files
@@ -249,6 +256,30 @@ App has two endpoint:
 1. Add content to `release` file
 
     This file will execute only when pushed code will be taged with `v*` expression.
+
+1. Set GH Secrets
+
+    `PROJECT_ID` - it's project - creeping-hobgoblins
+    `GCP_SA_KEY` - auth file in base64
+
+      ```bash
+      cat /home/kuba/.gcp/creeping-hobgoblins.json | base64
+      ```
+
+1. Push some code into repo
+
+    ```bash
+    git push origin master
+    git push origin v.0.0.1
+    ```
+
+1. Check status of pods
+
+    ```bash
+    kubectl get pods
+    kubectl describe pod <pod-name>
+    helm list release-k8s-app
+    ```
 
 [1]: https://github.com/labstack/echo
 

@@ -7,6 +7,11 @@ provider "google" {
  project     = var.project
 }
 
-module "function" {
+module "kubernetes" {
   source = "../Module/GKE"
 }
+
+#module "dns" {
+#  source = "../Module/DNS"
+#  service_ip = var.service_ip
+#}

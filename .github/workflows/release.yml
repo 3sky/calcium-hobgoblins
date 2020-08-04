@@ -10,6 +10,7 @@ env:
   APP_NAME: "k8s-app"
   CLUSTER_NAME: "my-gke-cluster"
   CLUSTER_ZONE: "europe-west3-a"
+  INGRESS_NAME: "nginx-ingress"
 
 jobs:
 
@@ -51,14 +52,6 @@ jobs:
       - name: config cluster
         run: gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE
       - name: set SERVICE_IP
-        run: echo ::set-env name=SERVICE_IP::$(kubectl get svc --namespace default release-$APP_NAME --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
+        run: echo ::set-env name=SERVICE_IP::$(kubectl get svc --namespace default release-$INGRESS_NAME --template "{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}")
       - name: upgrade release with helm
         run: ./setVersion.sh ${{ github.sha }} $APP_NAME
-      - name: Check app is working
-        uses: 3sky/glowing-spoon@v0.0.1
-        with:
-          hostname: $SERVICE_IP
-          path: '/status'
-          filter: '.status'
-          expected: 'OK'
-          unsecure: true

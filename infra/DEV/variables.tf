@@ -8,4 +8,9 @@ variable "path" {
   default = "auth.json"
 }
 
+variable "service_ip" {
+  type = list(string)
+  default = ["8.8.8.8"]
+}
+
 
