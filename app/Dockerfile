@@ -1,8 +1,8 @@
 FROM golang:alpine as builder
 RUN apk add --no-cache git gcc libc-dev
 WORKDIR /build/app
-# Get depedences
 
+# Get depedences
 COPY go.mod ./
 RUN go mod download
 

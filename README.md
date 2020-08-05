@@ -35,7 +35,7 @@ and logger is easy to use. \
 App has two endpoint:
 
 - `/` - which return `Hello World!`
-- '/status' - which retrun app status = `OK`
+- `/status` - which retrun app status = `OK`
 
 1. Download depedences
 
@@ -236,7 +236,7 @@ App has two endpoint:
 
     ```bash
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-    helm install nginx-ingress ingress-nginx/ingress-nginx
+    helm install release ingress-nginx/ingress-nginx
     ```
 
 ## Add GitHub Action Pipeline

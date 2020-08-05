@@ -10,7 +10,7 @@ env:
   APP_NAME: "k8s-app"
   CLUSTER_NAME: "my-gke-cluster"
   CLUSTER_ZONE: "europe-west3-a"
-  INGRESS_NAME: "nginx-ingress"
+  INGRESS_NAME: "nginx-ingress-controller"
 
 jobs:
 
