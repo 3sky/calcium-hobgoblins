@@ -1,0 +1,44 @@
+# Source: k8s-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-k8s-app
+  labels:
+    role: testing
+    topic: tekton
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-app
+  template:
+    metadata:
+      labels:
+        app: echo-app
+    spec:
+      serviceAccountName: docker-service
+      securityContext:
+        {}
+      containers:
+        - name: k8s-app
+          securityContext:
+            {}
+          image: "docker.io/3sky/calcium-hobgoblins:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 1323
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: http
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: http
+            periodSeconds: 60
+          resources:
+            {}
+
